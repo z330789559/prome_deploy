@@ -1,0 +1,41 @@
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+
+  backend:
+    # build: ./source/ambrus-backend-v2
+    build: ./source/backend
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:4001:3000
+    extra_hosts:
+      -  "host.docker.internal:host-gateway"
+    volumes:
+      - "./ResetPasswordEmailTemplate.txt:/app/ResetPasswordEmailTemplate.txt"
+      - "./VerificationCodeEmailTemplate.txt:/app/VerificationCodeEmailTemplate.txt"
+      - "./ReservedWords.txt:/app/ReservedWords.txt"
+      - "./alphaTestCompensationList.txt:/app/alphaTestCompensationList.txt"
+
+  back-admin:
+        build: ./source/back-admin
+        restart: unless-stopped  
+        ports:
+        - 127.0.0.1:8080:8080     
+        extra_hosts:
+        -  "host.docker.internal:host-gateway"  
+        volumes:
+        -  "/tmp/logs/admin:/tmp/logs" 
+
+  admin-web:
+        build: ./source/admin-web
+        restart: unless-stopped  
+        ports:
+          - 127.0.0.1:8060:80 
+  web-app:
+        build: ./source/weilany-app
+        restart: unless-stopped  
+        ports:
+          - 127.0.0.1:3000:3000
+
